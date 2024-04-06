@@ -18,10 +18,10 @@ def generate_account_number():
 
 
 #Check Balance
-def check_balance(mydb, account_number):
+def check_balance(mydb, account_number, user_id=None):
     try:
         cursor = mydb.cursor()
-        cursor.execute("SELECT balance FROM account WHERE account_number = %s", (account_number,))
+        cursor.execute("SELECT balance FROM user WHERE account_number = %s OR user_id = %s", (account_number,user_id))
         balance = cursor.fetchone()[0]
         cursor.close()
         return balance
@@ -31,13 +31,13 @@ def check_balance(mydb, account_number):
 
 
 #Create a new account
-def create_account(mydb,username, password, pin, is_admin=False,user_id=None,account_number=generate_account_number()): #default exceptions
+def create_account(mydb,username, email, password, pin, is_admin=False,user_id=None,account_number=generate_account_number()): #default exceptions
     try:
         cursor = mydb.cursor()
-        cursor.execute("INSERT INTO sys.user (user_id,username,password,pin,is_admin,account_number) VALUES (%s,%s,%s,%s,%s,%s)", (user_id,username,password,pin,is_admin,account_number))
+        cursor.execute("INSERT INTO sys.user (user_id,username,email,password,pin,is_admin,account_number,balance) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (user_id,username,email,password,pin,is_admin,account_number,0))
         mydb.commit()
         cursor.close()
-        print('Account created successfully')
+        print('Account created successfully. Account Number is', account_number)
     except mysql.connector.Error as err:
         print('Error creating account:', err)
         
@@ -51,6 +51,17 @@ def delete_account(mydb,account_number,user_id=None): #default exceptions
         print('Account deleted successfully')
     except mysql.connector.Error as err:
         print('Error deleting account:', err)
+
+#Modify account details #remeber to add email to modify
+def modify_account(mydb,account_number,username,email, password): 
+    try:
+        cursor = mydb.cursor()
+        cursor.execute("UPDATE user SET username = %s, email = %s, password = %s WHERE account_number = %s", (username,email,password,account_number))
+        mydb.commit()
+        cursor.close()
+        print('Modified Account successfully')
+    except mysql.connector.Error as err:
+        print('Error Modifying Account:', err)
 
 #Resets auto incrementation
 def reset_auto_increment(mydb): #
@@ -71,10 +82,11 @@ def close_connection(mydb):
 
 
 mydb = connect_to_database()
-#reset_auto_increment(mydb)
-#create_account(mydb,'dagem','bananas',2244)
-delete_account(mydb,None,7)
-
+reset_auto_increment(mydb)
+#create_account(mydb,'kevin','kevinballs@gmail.com','bananas',1221)
+modify_account(mydb,110346862,None,None,'socks')
+#delete_account(mydb,None,2)
+#print(check_balance(mydb, None, 2))
 
 close_connection(mydb)
 
