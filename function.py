@@ -110,7 +110,15 @@ def reset_auto_increment(mydb): #
     except mysql.connector.Error as err:
         print('Error resetting auto incrementation:', err)
 
+def get_user_data(mydb,account_number):
+    cursor = mydb.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Users WHERE account_number = %s", (account_number,))
+    user_data = cursor.fetchone()
+    cursor.close()
+    return user_data
+
 # Close connection to MySQL database
 def close_connection(mydb):
     mydb.close()
     print("Connection to the database closed")
+
