@@ -7,7 +7,7 @@ import random
 def connect_to_database():
     try:
         mydb = mysql.connector.connect(host="localhost", user="root", password="DCcode2@07")
-        print("Connected to the database")
+        print("Connected to the database\n")
         return mydb
     except mysql.connector.Error as err:
         print("Error connecting to the database:", err)
@@ -16,6 +16,25 @@ def connect_to_database():
 def generate_account_number():
     # Generate a 10-digit random number
     return int(random.random() * (10**9 - 1) + 10**8)
+
+#Checks Login
+def login(mydb,username,pin):
+    try:
+        # Check if account exists
+        cursor = mydb.cursor()
+        cursor.execute("SELECT * FROM sys.user WHERE username = %s AND pin = %s", (username, pin))
+        user = cursor.fetchone()
+        cursor.close()
+
+        if user:
+            print("Login successful!")            
+            return user
+        else:
+            print("Invalid username or PIN.\n")
+            return None
+    except mysql.connector.Error as err:
+        print("Error during login:", err)
+        return None
 
 
 #Check Balance
@@ -41,6 +60,7 @@ def deposit_funds(mydb, account_number, amount):
     except mysql.connector.Error as err:
        print("Error depositing funds:", err)
 
+# Withdraw funds
 def withdraw_funds(mydb, account_number, amount):
     try:
         cursor = mydb.cursor()
@@ -111,8 +131,8 @@ def reset_auto_increment(mydb): #
         print('Error resetting auto incrementation:', err)
 
 def get_user_data(mydb,account_number):
-    cursor = mydb.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM Users WHERE account_number = %s", (account_number,))
+    cursor = mydb.cursor()
+    cursor.execute("SELECT * FROM sys.user WHERE account_number = %s", (account_number,))
     user_data = cursor.fetchone()
     cursor.close()
     return user_data
@@ -120,5 +140,5 @@ def get_user_data(mydb,account_number):
 # Close connection to MySQL database
 def close_connection(mydb):
     mydb.close()
-    print("Connection to the database closed")
+    print("\nConnection to the database closed")
 
