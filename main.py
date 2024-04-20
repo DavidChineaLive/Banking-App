@@ -4,16 +4,6 @@ import function
 
 
 
-
-#print(function.check_balance(mydb,110346862))
-#create_account(mydb,'kevin','bananas', 'kevinballs@gmail.com',1221)
-#modify_account(mydb,110346862,'kevinRules','socksOff','kevinRules@gmail.com', 1221,)
-#function.delete_account(mydb,None,2)
-#print(check_balance(mydb, None, 2))
-#deposit_funds(mydb, 110346862, 20)
-#withdraw_funds(mydb, 110346862, 20)
-#print(check_balance(mydb,110346862))
-
 def display_options():
     print("-------------------------------------------------------------")
     print("Welcome to Online Banking! Please Login or Create an Account:")
@@ -24,17 +14,29 @@ def display_options():
 
 def create_account(mydb):
     username = input("Enter your username: ")
-    password = input("Enter your password: ")
+    is_admin = False
+    if username.lower() == "admin":
+        username = input("Enter your admin username: ")
+        password = input("Enter your admin password: ")
+        is_admin = True
+    else:
+        password = input("Enter your password: ")
     email = input("Enter your email: ")
     pin = input("Enter your PIN: ")
-    function.create_account(mydb,username, password, email, pin)
-    return function.login(mydb,username,pin)
+    function.create_account(mydb,username, password, email, pin, is_admin)
+    return function.login(mydb,username,password,is_admin)
 
 def login(mydb):
     username = input("Enter your username: ")
-    pin = input("Enter your PIN: ")
-    return function.login(mydb,username,pin)
-    
+    is_admin = False
+    if username.lower() == "admin":
+        username = input("Enter your admin username: ")
+        password = input("Enter your admin password: ")
+        is_admin = True
+    else:
+        password = input("Enter your password: ")
+    return function.login(mydb,username,password,is_admin)
+
 
 def dashboard(mydb,user):
     while True:
@@ -46,6 +48,8 @@ def dashboard(mydb,user):
         print("3. Withdraw Funds")
         print("4. Modify Account Details")
         print("5. Logout")
+        if user[7]:
+            print("6. View Database")
         print("-------------------------------------------------------------")
         choice = input("Enter your choice (1-5): ")
 
@@ -54,16 +58,34 @@ def dashboard(mydb,user):
             if balance is not None:
                 print("Your current balance is: ${:.2f}".format(balance))
         elif choice == "2":
-            amount = float(input("Enter the amount to deposit: $"))
-            function.deposit_funds(mydb, user[4], amount)  
+            pin = int(input("PIN: "))
+            if(function.check_pin(mydb,user[4],pin)):
+                amount = float(input("Enter the amount to deposit: $"))
+                function.deposit_funds(mydb, user[4], amount) 
+            else:
+                print("Incorrect PIN. Please try again.") 
         elif choice == "3":
-            amount = float(input("Enter the amount to withdraw: $"))
-            function.withdraw_funds(mydb, user[4], amount) 
+            pin = int(input("PIN: "))
+            if(function.check_pin(mydb,user[4],pin)):
+                amount = float(input("Enter the amount to withdraw: $"))
+                function.withdraw_funds(mydb, user[4], amount) 
+            else:
+                print("Incorrect PIN. Please try again.")
         elif choice == "4":
-            modify_menu(mydb, user)
+            delete_account_flag =modify_menu(mydb, user)
+            if delete_account_flag:
+                print("Logging out...")
+                break
         elif choice == "5":
             print("Logging out...")
             break
+        elif choice == "6":
+            if  user[7]:
+                function.view_database(mydb)
+            else:
+                print("Access denied. Please enter a number between 1 and 5.")  
+        elif choice == "-1":
+            break  
         else:
             print("Invalid choice. Please enter a number between 1 and 5.")
     
@@ -74,8 +96,9 @@ def modify_menu(mydb, user):
         print("1. Change Username")
         print("2. Change Password")
         print("3. Change Email")
-        print("4. Delete Account")
-        print("5. Go Back")
+        print("4. Change PIN")
+        print("5. Delete Account")
+        print("6. Go Back")
         print("-------------------------------------------------------------")
         choice = input("Enter your choice (1-5): ")
 
@@ -89,13 +112,17 @@ def modify_menu(mydb, user):
             new_email = input("Enter your new email: ")
             function.modify_account(mydb, user[4], new_email=new_email) 
         elif choice == "4":
-            function.delete_account(mydb,user[4])
-            break
+            new_pin = input("Enter your PIN: ")
+            function.modify_account(mydb, user[4], new_pin=new_pin) 
         elif choice == "5":
-            break
-            #pass  # Go back to dashboard
+            function.delete_account(mydb,user[4])
+            return True
+        elif choice == "6":
+            return False
         else:
             print("Invalid choice. Please enter a number between 1 and 5.")
+
+
 
 mydb = function.connect_to_database()
 while True:
@@ -106,10 +133,17 @@ while True:
     if choice == "1":
         user = login(mydb)
         if user:
-            dashboard(mydb,user)
+            if user[7]:
+                
+                dashboard(mydb,user)
+            else:
+                dashboard(mydb,user)
     elif choice == "2":
         user = create_account(mydb)
-        dashboard(mydb,user)
+        if user[7]:
+            dashboard(mydb,user)
+        else:
+            dashboard(mydb,user)
     elif choice == "-1":
         break
     else:

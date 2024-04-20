@@ -18,11 +18,11 @@ def generate_account_number():
     return int(random.random() * (10**9 - 1) + 10**8)
 
 #Checks Login
-def login(mydb,username,pin):
+def login(mydb,username,password,is_admin=False):
     try:
         # Check if account exists
         cursor = mydb.cursor()
-        cursor.execute("SELECT * FROM sys.user WHERE username = %s AND pin = %s", (username, pin))
+        cursor.execute("SELECT * FROM sys.user WHERE username = %s AND password = %s AND is_admin = %s", (username, password, is_admin))
         user = cursor.fetchone()
         cursor.close()
 
@@ -30,7 +30,7 @@ def login(mydb,username,pin):
             print("Login successful!")            
             return user
         else:
-            print("Invalid username or PIN.\n")
+            print("Invalid username or password.\n")
             return None
     except mysql.connector.Error as err:
         print("Error during login:", err)
@@ -48,6 +48,21 @@ def check_balance(mydb, account_number, user_id=None):
     except mysql.connector.Error as err:
         print('Error checking balance:', err)
         return None
+
+#Checks pin for depositing and withdrawing
+def check_pin(mydb, account_number, pin):
+    try:
+        cursor = mydb.cursor()
+        cursor.execute("SELECT pin FROM sys.user WHERE account_number = %s", (account_number,))
+        realPin = cursor.fetchone()
+        cursor.close()
+        if realPin[0] == pin:
+            return True
+        else:
+            return False
+    except mysql.connector.Error as err:
+        print("Error entering pin funds:", err)
+        return False
 
 # Deposit funds
 def deposit_funds(mydb, account_number, amount):
@@ -136,6 +151,24 @@ def get_user_data(mydb,account_number):
     user_data = cursor.fetchone()
     cursor.close()
     return user_data
+
+def view_database(mydb):
+    try:
+        cursor = mydb.cursor()
+        cursor.execute("SELECT * FROM sys.user")
+        users = cursor.fetchall()
+        cursor.close()
+
+        if users:
+            print("-------------------------------------------------------------")
+            print("Users in the Database:")
+            for user in users:
+                print("User: "+str(user[0])+", "+ user[1]+", "+ user[2]+", "+ str(user[4]))  
+            input("\n1. Back\n")
+        else:
+            print("No users found in the database.")
+    except mysql.connector.Error as err:
+        print("Error viewing database:", err)
 
 # Close connection to MySQL database
 def close_connection(mydb):
