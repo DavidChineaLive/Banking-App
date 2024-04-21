@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Welcome, {{ username }}!</h1>
+    <p>Your email is {{ email }} and your PIN is {{ pin }}.</p>
+    <ul>
+        <li><a href="/balance">Check Balance</a></li>
+        <li><a href="/deposit">Deposit Funds</a></li>
+        <li><a href="/withdraw">Withdraw Funds</a></li>
+        <li><a href="/modify">Modify Account</a></li>
+        <li><a href="/logout">Logout</a></li>
+    </ul>
+</body>
+</html>

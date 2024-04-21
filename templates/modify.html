@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Modify Account</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Modify Account</h1>
+    <form action="/modify" method="post">
+        <label for="username">New Username:</label><br>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">New Password:</label><br>
+        <input type="text" id="password" name="password" required><br>
+        <label for="email">New Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+        <label for="pin">New PIN:</label><br>
+        <input type="number" id="pin" name="pin" required><br>
+        <input type="submit" value="Modify Account">
+    </form>
+    <form action="/delete_account" method="post">
+        <input type="submit" value="Delete Account">
+    </form>
+    <a href="/">Back</a>
+</body>
+</html>

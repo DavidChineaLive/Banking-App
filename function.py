@@ -12,12 +12,12 @@ def connect_to_database():
     except mysql.connector.Error as err:
         print("Error connecting to the database:", err)
         return None
-    
+
+# Generates a random 10-digit account number
 def generate_account_number():
-    # Generate a 10-digit random number
     return int(random.random() * (10**9 - 1) + 10**8)
 
-#Checks Login
+# Authenticate user login
 def login(mydb,username,password,is_admin=False):
     try:
         # Check if account exists
@@ -27,6 +27,8 @@ def login(mydb,username,password,is_admin=False):
         cursor.close()
 
         if user:
+            print(user)
+            print(user[4])
             print("Login successful!")            
             return user
         else:
@@ -37,9 +39,10 @@ def login(mydb,username,password,is_admin=False):
         return None
 
 
-#Check Balance
+#Check Account Balance
 def check_balance(mydb, account_number, user_id=None):
     try:
+        # Retrieving balance from database
         cursor = mydb.cursor()
         cursor.execute("SELECT balance FROM sys.user WHERE account_number = %s OR user_id = %s", (account_number,user_id))
         balance = cursor.fetchone()[0]
@@ -49,9 +52,10 @@ def check_balance(mydb, account_number, user_id=None):
         print('Error checking balance:', err)
         return None
 
-#Checks pin for depositing and withdrawing
+#Checks PIN for depositing and withdrawing
 def check_pin(mydb, account_number, pin):
     try:
+        # Retrieving PIN from database
         cursor = mydb.cursor()
         cursor.execute("SELECT pin FROM sys.user WHERE account_number = %s", (account_number,))
         realPin = cursor.fetchone()
@@ -64,9 +68,10 @@ def check_pin(mydb, account_number, pin):
         print("Error entering pin funds:", err)
         return False
 
-# Deposit funds
+# Deposit funds into an account
 def deposit_funds(mydb, account_number, amount):
     try:
+        # Updating balance in the database
         cursor = mydb.cursor()
         cursor.execute("UPDATE sys.user SET balance = balance + %s WHERE account_number = %s", (amount, account_number))
         mydb.commit()
@@ -75,9 +80,10 @@ def deposit_funds(mydb, account_number, amount):
     except mysql.connector.Error as err:
        print("Error depositing funds:", err)
 
-# Withdraw funds
+# Withdraw funds from an account
 def withdraw_funds(mydb, account_number, amount):
     try:
+        # Checking balance and updating database
         cursor = mydb.cursor()
         cursor.execute("SELECT balance FROM sys.user WHERE account_number = %s", (account_number,))
         balance = cursor.fetchone()[0]
@@ -95,6 +101,7 @@ def withdraw_funds(mydb, account_number, amount):
 #Create a new account
 def create_account(mydb,username, password, email, pin, is_admin=False,user_id=None,account_number=generate_account_number()): #default exceptions
     try:
+        # Inserting new account details into the database
         cursor = mydb.cursor()
         cursor.execute("INSERT INTO sys.user (user_id,username,email,password,pin,is_admin,account_number,balance) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (user_id,username,email,password,pin,is_admin,account_number,0))
         mydb.commit()
@@ -106,6 +113,7 @@ def create_account(mydb,username, password, email, pin, is_admin=False,user_id=N
 #Deletes an account
 def delete_account(mydb,account_number,user_id=None): #default exceptions
     try:
+        # Deleting account from the database
         cursor = mydb.cursor()
         cursor.execute("DELETE FROM sys.user WHERE account_number = %s OR user_id = %s", (account_number,user_id)) 
         mydb.commit()
@@ -114,9 +122,10 @@ def delete_account(mydb,account_number,user_id=None): #default exceptions
     except mysql.connector.Error as err:
         print('Error deleting account:', err)
 
-#Modify account details #remeber to add email to modify
+#Modify account details 
 def modify_account(mydb,account_number,new_username=None, new_password=None, new_email=None,new_pin=None, is_admin=None): 
     try:
+        # Modifying account details in the database
         cursor = mydb.cursor()
         if new_username is not None:
             cursor.execute("UPDATE sys.user SET username = %s WHERE account_number = %s", (new_username,account_number))
@@ -137,6 +146,7 @@ def modify_account(mydb,account_number,new_username=None, new_password=None, new
 #Resets auto incrementation
 def reset_auto_increment(mydb): #
     try:
+        # Resetting auto increment in the database
         cursor = mydb.cursor()
         cursor.execute("ALTER TABLE sys.user AUTO_INCREMENT = 1")
         mydb.commit()
@@ -145,6 +155,7 @@ def reset_auto_increment(mydb): #
     except mysql.connector.Error as err:
         print('Error resetting auto incrementation:', err)
 
+# Gets user data from the database
 def get_user_data(mydb,account_number):
     cursor = mydb.cursor()
     cursor.execute("SELECT * FROM sys.user WHERE account_number = %s", (account_number,))
@@ -152,8 +163,10 @@ def get_user_data(mydb,account_number):
     cursor.close()
     return user_data
 
+# Views all users in the database
 def view_database(mydb):
     try:
+         # Retrieving all users from the database
         cursor = mydb.cursor()
         cursor.execute("SELECT * FROM sys.user")
         users = cursor.fetchall()
@@ -164,7 +177,6 @@ def view_database(mydb):
             print("Users in the Database:")
             for user in users:
                 print("User: "+str(user[0])+", "+ user[1]+", "+ user[2]+", "+ str(user[4]))  
-            input("\n1. Back\n")
         else:
             print("No users found in the database.")
     except mysql.connector.Error as err:

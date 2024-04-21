@@ -1,9 +1,8 @@
-# Importing module 
 from flask import Flask
 import function
 
 
-
+# Function to display login or account creation options
 def display_options():
     print("-------------------------------------------------------------")
     print("Welcome to Online Banking! Please Login or Create an Account:")
@@ -12,6 +11,7 @@ def display_options():
     print("2. Create an Account")
     print("-------------------------------------------------------------")
 
+# Create a new account using function.create_account()
 def create_account(mydb):
     username = input("Enter your username: ")
     is_admin = False
@@ -26,6 +26,7 @@ def create_account(mydb):
     function.create_account(mydb,username, password, email, pin, is_admin)
     return function.login(mydb,username,password,is_admin)
 
+# For user login using function.login()
 def login(mydb):
     username = input("Enter your username: ")
     is_admin = False
@@ -38,9 +39,10 @@ def login(mydb):
     return function.login(mydb,username,password,is_admin)
 
 
+# Display user dashboard
 def dashboard(mydb,user):
     while True:
-        print("-------------------------------------------------------------")
+        print("\n-------------------------------------------------------------")
         print("Welcome to Your Dashboard, "+user[1]+"!")  
         print("-------------------------------------------------------------")
         print("1. Check Balance")
@@ -48,11 +50,12 @@ def dashboard(mydb,user):
         print("3. Withdraw Funds")
         print("4. Modify Account Details")
         print("5. Logout")
-        if user[7]:
+        if user[7]: # Checking admin privileges
             print("6. View Database")
         print("-------------------------------------------------------------")
         choice = input("Enter your choice (1-5): ")
 
+        # Handling user choices
         if choice == "1":
             balance = function.check_balance(mydb, user[4]) 
             if balance is not None:
@@ -80,8 +83,9 @@ def dashboard(mydb,user):
             print("Logging out...")
             break
         elif choice == "6":
-            if  user[7]:
-                function.view_database(mydb)
+            if  user[7]: # Checking admin privileges
+                function.view_database(mydb) 
+                print("\n1. Back\n")  
             else:
                 print("Access denied. Please enter a number between 1 and 5.")  
         elif choice == "-1":
@@ -89,6 +93,7 @@ def dashboard(mydb,user):
         else:
             print("Invalid choice. Please enter a number between 1 and 5.")
     
+# For modifying account details
 def modify_menu(mydb, user):
     while True:
         print("-------------------------------------------------------------")
@@ -102,6 +107,7 @@ def modify_menu(mydb, user):
         print("-------------------------------------------------------------")
         choice = input("Enter your choice (1-5): ")
 
+        # Handling modification choices
         if choice == "1":
             new_username  = input("Enter your new username: ")
             function.modify_account(mydb, user[4], new_username=new_username)  
@@ -123,8 +129,10 @@ def modify_menu(mydb, user):
             print("Invalid choice. Please enter a number between 1 and 5.")
 
 
-
+# Establishing a connection to the database
 mydb = function.connect_to_database()
+
+# Main loop for user interaction
 while True:
     
     function.reset_auto_increment(mydb)
@@ -133,14 +141,14 @@ while True:
     if choice == "1":
         user = login(mydb)
         if user:
-            if user[7]:
+            if user[7]: # Checking admin privileges
                 
                 dashboard(mydb,user)
             else:
                 dashboard(mydb,user)
     elif choice == "2":
         user = create_account(mydb)
-        if user[7]:
+        if user[7]: # Checking admin privileges
             dashboard(mydb,user)
         else:
             dashboard(mydb,user)
@@ -149,7 +157,7 @@ while True:
     else:
         print("Invalid choice. Please enter 1 or 2.")
     
-
+# Closing the database connection
 function.close_connection(mydb)
 
 

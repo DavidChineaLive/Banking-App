@@ -1,19 +1,38 @@
 
-<!--
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Users</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div><h1>Home Page</h1></div>
-    <p>Hello, {{name}}</p>
+    <h1>Users in the Database:</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>PIN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user[0] }}</td>
+                    <td>{{ user[1] }}</td>
+                    <td>{{ user[2] }}</td>
+                    <td>{{ user[4] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
--->
 
+
+
+<!--
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,22 +42,25 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to Online Banking</h1>
-        <div>
-            <form action="/login" method="post">
-                <h2>Login</h2>
-                <label for="account_number">Account Number:</label>
-                <input type="text" id="account_number" name="account_number" required><br><br>
-                <label for="pin">PIN:</label>
-                <input type="password" id="pin" name="pin" required><br><br>
+    <h1>Welcome to Online Banking</h1>
+    <div class="options">
+        <div class="option">
+            <h2>Login</h2>
+            <form action="{{ url_for('views.login') }}" method="post">
+                <label for="username">Username:</label><br>
+                <input type="text" id="username" name="username" required><br><br>
+                <label for="password">Password:</label><br>
+                <input type="password" id="password" name="password" required><br><br>
                 <button type="submit">Login</button>
             </form>
         </div>
-        <div>
+        <div class="option">
             <h2>Create New Account</h2>
-            <a href="/create_account">Create Account</a>
+            <form action="{{ url_for('views.create_account') }}" method="get">
+                <button type="submit">Create Account</button>
+            </form>
         </div>
     </div>
 </body>
 </html>
+-->

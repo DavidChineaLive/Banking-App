@@ -1,29 +1,91 @@
-from flask import Flask, render_template, request, redirect, url_for
-from views import views
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+import function
+import os 
 
 app = Flask(__name__)
-app.secret_key = 'secret_key'
-app.register_blueprint(views, url_prefix="/views")
+app.secret_key = os.urandom(24)  # Secret key for session management
 
-# Dummy user data for demonstration
-users = {
-    "1234567890": {"pin": "1234", "username": "Alice", "balance": 1000.00},
-    "0987654321": {"pin": "4321", "username": "Bob", "balance": 500.00}
-}
+"""
+@app.route('/')
+def index():
+    mydb = function.connect_to_database()
+    users = function.login(mydb)#not correct parameters
+    function.close_connection(mydb)
+    return render_template('index.html', users=users)
+"""
 
-@app.route("/", methods=["GET", "POST"])
-def home():
-    if request.method == "POST":
-        account_number = request.form.get("account_number")
-        pin = request.form.get("pin")
-        if account_number in users and users[account_number]["pin"] == pin:
-            # Redirect to user dashboard or specific functionality
-            return redirect(url_for("views.dashboard", account_number=account_number))
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        mydb = function.connect_to_database()
+        user = function.login(mydb, username, password)
+        if user:
+            session['user_id'] = user[0]
+            session['account_number'] = user[4]
+            redirect(url_for('dashboard'))
+            return dashboard(username=user[1], email=user[2],pin=user[5])
         else:
-            return "Invalid account number or PIN. Please try again."
-    return render_template("index.html")
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        pin = request.form['pin']
+        mydb = function.connect_to_database()
+        function.create_account(mydb,username, email, password, pin)
+        function.close_connection(mydb)
+        flash('Account created successfully')
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/dashboard/')
+def dashboard(username, email,pin):
+    return render_template('dashboard.html', username=username,email=email,pin=pin)
+
+"""
+@app.route('/balance', methods=['GET', 'POST'])
+def balance():
+    mydb = function.connect_to_database()
+    if request.method == 'POST':
+        function.check_balance(mydb, username, email, pin)
+        flash('')
+        return redirect(url_for('dashboard', user=username))
+    return render_template('modify.html')
+"""
+
+@app.route('/modify', methods=['GET', 'POST'])
+def modify():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        pin = request.form['pin']
+        mydb = function.connect_to_database()
+        function.modify_account(mydb,username, password, email, pin)
+        function.close_connection(mydb)
+        flash('Account modified successfully')
+        return redirect(url_for('dashboard', user=username))
+    return render_template('modify.html')
+
+@app.route('/delete_account', methods=['POST'])
+def delete_account(account_number):
+    mydb = function.connect_to_database()
+    function.delete_account(mydb, account_number)
+    function.close_connection(mydb)
+    flash('Account deleted successfully!')
+    return redirect(url_for('login'))
+
+@app.route('/logout')
+def logout():
+    return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
-    app.run(debug=False, port =8000)
-
-
+    app.run(debug=True)
