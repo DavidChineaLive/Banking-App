@@ -71,7 +71,7 @@ def dashboard(mydb,user):
             pin = int(input("PIN: "))
             if(function.check_pin(mydb,user[4],pin)):
                 amount = float(input("Enter the amount to withdraw: $"))
-                function.withdraw_funds(mydb, user[4], amount) 
+                function.withdraw_funds(mydb, user[4], amount,user[6]) 
             else:
                 print("Incorrect PIN. Please try again.")
         elif choice == "4":

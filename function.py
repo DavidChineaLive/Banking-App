@@ -81,13 +81,11 @@ def deposit_funds(mydb, account_number, amount):
        print("Error depositing funds:", err)
 
 # Withdraw funds from an account
-def withdraw_funds(mydb, account_number, amount):
+def withdraw_funds(mydb, account_number, amount, balance):
     try:
         # Checking balance and updating database
-        cursor = mydb.cursor()
-        cursor.execute("SELECT balance FROM sys.user WHERE account_number = %s", (account_number,))
-        balance = cursor.fetchone()[0]
-        if balance >= amount:
+        if balance >= float(amount):
+            cursor = mydb.cursor()
             cursor.execute("UPDATE sys.user SET balance = balance - %s WHERE account_number = %s", (amount, account_number))
             mydb.commit()
             cursor.close()
