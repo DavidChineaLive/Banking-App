@@ -7,6 +7,15 @@ This file displays an extra testing file for the functions in function.py.
 Demonstrates a fully functional Command Line Interface (CLI) for the Online Banking program.
 This file is not used in the final version of the program.
 Run the app.py file to run the program using flask.
+
+Only this version of my banking has a admin functionality where the admin can view all the accounts and their information 
+(only admins have access, it will deny the user)
+
+The example accounts:
+id	username	  email             	password	   account#	    pin	   balance	isAdmin
+1	david	    David.Chinea@live.com	pass	        159016505	1234	25.00	0
+2	Theadmin	the.admin@gmail.com	    adminpassword	540471602	5555	250.00	1
+
 """
 
 # Function to display login or account creation options
