@@ -2,6 +2,13 @@ from flask import Flask
 import function
 
 
+"""
+This file displays an extra testing file for the functions in function.py.
+Demonstrates a fully functional Command Line Interface (CLI) for the Online Banking program.
+This file is not used in the final version of the program.
+Run the app.py file to run the program using flask.
+"""
+
 # Function to display login or account creation options
 def display_options():
     print("-------------------------------------------------------------")

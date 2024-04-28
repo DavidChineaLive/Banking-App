@@ -3,14 +3,27 @@
 <head>
     <title>Online Banking</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .flash-message {
+           color: red;
+         }
+    </style>
 </head>
 <body>
+    <h1>Welcome to Online Banking!</h1>
     <h1>Login</h1>
     <form action="/login" method="post">
         <label for="username">Username:</label><br>
         <input type="text" id="username" name="username" required><br>
         <label for="password">Password:</label><br>
         <input type="password" id="password" name="password" required><br>
+        <!--
+        <label for="is_admin">Are you an admin?</label>
+        <input type="checkbox" id="is_admin" name="is_admin"><br>
+        -->
+        {% for message in get_flashed_messages() %}
+            <p class="flash-message">{{ message }}</p>
+        {% endfor %}
         <input type="submit" value="Login">
     </form>
     <p>Don't have an account? <a href="/register">Register here</a>.</p>

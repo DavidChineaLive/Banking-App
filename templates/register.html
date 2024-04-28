@@ -3,6 +3,11 @@
 <head>
     <title>Register</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .flash-message {
+           color: red;
+         }
+    </style>
 </head>
 <body>
     <h1>Register</h1>
@@ -17,6 +22,9 @@
         <input type="number" id="pin" name="pin" required><br>
         <input type="submit" value="Register">
     </form>
+    {% for message in get_flashed_messages() %}
+            <p class="flash-message">{{ message }}</p>
+        {% endfor %}
     <p>Already have an account? <a href="/login">Login here</a>.</p>
 </body>
 </html>

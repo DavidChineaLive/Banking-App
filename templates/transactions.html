@@ -2,19 +2,32 @@
 <html>
   <head>
     <title>Transaction</title>
+    <style>
+      .flash-message {
+         color: red;
+       }
+  </style>
   </head>
   <body>
     <h1>Current Balance: ${{ balance }}</h1>
     <h2>Deposit</h2>
     <form action="/deposit" method="post">
-        <input type="number" name="depositAmount" id="depositAmount" placeholder="Enter amount to deposit">
+        <input type="number" name="depositAmount" id="depositAmount" step="0.01" placeholder="Enter amount to deposit">
         <button type="submit">Confirm</button>
       </form>
     <h2>Withdraw</h2>
     <form action="/withdraw" method="post">
-        <input type="number" name="withdrawAmount" id="withdrawAmount" placeholder="Enter amount to withdraw">
+        <input type="number" name="withdrawAmount" id="withdrawAmount" step="0.01" placeholder="Enter amount to withdraw">
         <button type="submit">Confirm</button>
       </form>
+      <!-- 
+      <form action="/check_pin" method="post">
+        <label for="pin">PIN:</label><br>
+        <input type="number" id="pin" name="pin" required><br>
+      </form> -->
+      {% for message in get_flashed_messages() %}
+            <p class="flash-message">{{ message }}</p>
+        {% endfor %}
       <a href="/">Back</a>
   </body>
 </html>

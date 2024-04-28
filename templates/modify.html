@@ -3,6 +3,11 @@
 <head>
     <title>Modify Account</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .flash-message {
+           color: red;
+         }
+    </style>
 </head>
 <body>
     <h1>Modify Account</h1>
@@ -20,6 +25,9 @@
     <form action="/delete_account" method="post">
         <input type="submit" value="Delete Account">
     </form>
+    {% for message in get_flashed_messages() %}
+            <p class="flash-message">{{ message }}</p>
+        {% endfor %}
     <a href="/">Back</a>
 </body>
 </html>
